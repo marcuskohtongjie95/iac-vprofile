@@ -34,7 +34,7 @@ resource "aws_security_group_rule" "allow_http" {
   from_port         = 8080
   to_port           = 8080
   protocol          = "tcp"
-  source_security_group_id = "sgr-0e278eb14d23ee2df"
+  source_security_group_id = "sg-0eec7f42b8f023828"
   
   # Reference the EKS cluster security group from the module output
   security_group_id = module.eks.cluster_security_group_id

@@ -27,3 +27,15 @@ module "eks" {
 
   }
 }
+
+# Adding an inbound rule to the EKS security group
+resource "aws_security_group_rule" "allow_http" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id = "sgr-0e278eb14d23ee2df"
+  
+  # Reference the EKS cluster security group from the module output
+  security_group_id = module.eks.cluster_security_group_id
+}

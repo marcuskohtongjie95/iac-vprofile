@@ -1,9 +1,6 @@
 pipeline {
 
     agent any
-
-	tools {
-    }
  
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')

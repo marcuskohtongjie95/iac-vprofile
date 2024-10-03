@@ -31,6 +31,7 @@ pipeline {
 
         stage('Initialize Terraform') {
             steps {
+                dir('terraform') {
                 // Initialize Terraform with backend config for S3 state and DynamoDB for locking
                 sh '''
                 terraform init \
@@ -40,6 +41,7 @@ pipeline {
                 -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
                 -backend-config="encrypt=true"
                 '''
+                }
             }
         }
 

@@ -27,9 +27,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "marcuskoh95-gitops-proj-s3-terraformstate"
-    key    = "terraform.tfstate"
-    region = "us-east-1"
+    bucket         = "marcuskoh95-gitops-proj-s3-terraformstate"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
     dynamodb_table = "gitops-proj-dynamodb-statelock"
   }
 

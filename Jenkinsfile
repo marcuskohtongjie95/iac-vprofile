@@ -28,7 +28,6 @@ pipeline {
                 git branch: "${branchName}", url: "${gitRepo}"
             }
         }
-    }
 
         stage('Initialize Terraform') {
             steps {
@@ -53,5 +52,5 @@ pipeline {
             }
         }
 
-
+    }
 }

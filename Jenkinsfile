@@ -36,7 +36,7 @@ pipeline {
                 sh '''
                 terraform init \
                 -backend-config="bucket=$S3_BUCKET" \
-                -backend-config="terraform.tfstate" \
+                -backend-config="key=terraform.tfstate" \
                 -backend-config="region=$AWS_DEFAULT_REGION" \
                 -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
                 -backend-config="encrypt=true"

@@ -5,6 +5,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION     = 'us-east-1'                   // Set your AWS region
 
         gitRepo = 'https://github.com/marcuskohtongjie95/iac-vprofile.git'
         branchName = 'stage'
@@ -28,4 +29,18 @@ pipeline {
             }
         }
     }
-}  
+
+    stage('Initialize Terraform') {
+        steps {
+            // Initialize Terraform with backend config for S3 state and DynamoDB for locking
+            sh '''
+            terraform init \
+              -backend-config="bucket=$S3_BUCKET" \
+              -backend-config="terraform.tfstate" \
+              -backend-config="region=$AWS_DEFAULT_REGION" \
+              -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
+              -backend-config="encrypt=true"
+            '''
+        }
+    }    
+}

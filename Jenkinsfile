@@ -42,5 +42,16 @@ pipeline {
               -backend-config="encrypt=true"
             '''
         }
-    }    
+    }
+
+    stage('Terraform Plan') {
+        steps {
+            // Run Terraform plan to show infrastructure changes
+            sh '''
+            terraform plan -var="aws_region=$AWS_DEFAULT_REGION"
+            '''
+        }
+    }
+
+
 }

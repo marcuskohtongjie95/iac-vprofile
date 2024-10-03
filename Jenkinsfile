@@ -50,7 +50,7 @@ pipeline {
                 dir('terraform') {
                 // Run Terraform plan to show infrastructure changes
                 sh '''
-                terraform plan -var="aws_region=$AWS_DEFAULT_REGION"
+                terraform plan
                 '''
                 }
             }

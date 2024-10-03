@@ -30,6 +30,7 @@ terraform {
     bucket = "marcuskoh95-gitops-proj-s3-terraformstate"
     key    = "terraform.tfstate"
     region = "us-east-1"
+    dynamodb_table = "gitops-proj-dynamodb-statelock"
   }
 
   required_version = "~> 1.9.5"

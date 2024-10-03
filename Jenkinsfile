@@ -30,28 +30,28 @@ pipeline {
         }
     }
 
-    stage('Initialize Terraform') {
-        steps {
-            // Initialize Terraform with backend config for S3 state and DynamoDB for locking
-            sh '''
-            terraform init \
-              -backend-config="bucket=$S3_BUCKET" \
-              -backend-config="terraform.tfstate" \
-              -backend-config="region=$AWS_DEFAULT_REGION" \
-              -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
-              -backend-config="encrypt=true"
-            '''
+        stage('Initialize Terraform') {
+            steps {
+                // Initialize Terraform with backend config for S3 state and DynamoDB for locking
+                sh '''
+                terraform init \
+                -backend-config="bucket=$S3_BUCKET" \
+                -backend-config="terraform.tfstate" \
+                -backend-config="region=$AWS_DEFAULT_REGION" \
+                -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
+                -backend-config="encrypt=true"
+                '''
+            }
         }
-    }
 
-    stage('Terraform Plan') {
-        steps {
-            // Run Terraform plan to show infrastructure changes
-            sh '''
-            terraform plan -var="aws_region=$AWS_DEFAULT_REGION"
-            '''
+        stage('Terraform Plan') {
+            steps {
+                // Run Terraform plan to show infrastructure changes
+                sh '''
+                terraform plan -var="aws_region=$AWS_DEFAULT_REGION"
+                '''
+            }
         }
-    }
 
 
 }

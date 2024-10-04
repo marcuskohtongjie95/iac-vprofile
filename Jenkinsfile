@@ -45,6 +45,16 @@ pipeline {
             }
         }
 
+        stage('Terraform Validate') {
+            steps {
+                dir('terraform') {
+                    sh '''
+                    terraform validate
+                    '''
+                }
+            }
+        }
+
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
@@ -55,6 +65,20 @@ pipeline {
                 }
             }
         }
+
+       stage('Terraform Apply') {
+            steps {
+                lock(resource: 'terraform-lock') {
+                    dir('terraform') {
+                    // Run Terraform plan to show infrastructure changes
+                    sh '''
+                    terraform apply -auto-approve
+                    '''
+                    }
+                }    
+            }
+        }
+        
 
     }
 }

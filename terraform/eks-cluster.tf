@@ -36,6 +36,10 @@ resource "aws_security_group_rule" "allow_http" {
   protocol                 = "tcp"
   source_security_group_id = "sg-0eec7f42b8f023828"
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   # Reference the EKS cluster security group from the module output
   security_group_id = module.eks.cluster_security_group_id
 }

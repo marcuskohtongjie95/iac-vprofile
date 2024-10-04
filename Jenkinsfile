@@ -68,7 +68,6 @@ pipeline {
 
        stage('Terraform Apply') {
             steps {
-                lock(resource: 'terraform-lock') {
                     dir('terraform') {
                     // Run Terraform plan to show infrastructure changes
                     sh '''
@@ -77,7 +76,6 @@ pipeline {
                     }
                 }    
             }
-        }
         
 
     }

@@ -29,14 +29,6 @@ pipeline {
             }
         }
 
-        stage('Update kubeconfig') {
-            steps {
-                    sh '''
-                    aws eks --region us-east-1 update-kubeconfig --name gitops-proj-eks
-                    '''
-                    }
-                }  
-
         stage('Initialize Terraform') {
             steps {
                 dir('terraform') {
@@ -84,6 +76,14 @@ pipeline {
                     }
                 }    
             }
+        
+         stage('Update kubeconfig') {
+            steps {
+                    sh '''
+                    aws eks --region us-east-1 update-kubeconfig --name gitops-proj-eks
+                    '''
+                    }
+                }     
 
         stage('Deploy ArgoCD to EKS') {
             steps {

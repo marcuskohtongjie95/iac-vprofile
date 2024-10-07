@@ -137,5 +137,73 @@ pipeline {
             }
         }
 
+
+        stage('Deploy Monitoring Stack (Prometheus and Grafana)') {
+            steps {
+                script {
+                    sh '''
+                    #!/bin/bash
+
+                    # Step 1: Add Prometheus and Grafana Helm repositories
+                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                    helm repo add grafana https://grafana.github.io/helm-charts
+
+                    # Step 2: Update Helm repositories
+                    helm repo update
+
+                    # Step 3: Check if Prometheus is already installed
+                    if helm list -n monitoring | grep prometheus > /dev/null 2>&1; then
+                        echo "Prometheus is already deployed, skipping installation."
+                    else
+                        # Step 4: Install Prometheus using Helm
+                        echo "Deploying Prometheus..."
+                        helm upgrade --install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace
+                    fi
+
+                    # Step 5: Wait for Prometheus to be ready
+                    kubectl wait --namespace monitoring \
+                    --for=condition=available deployment/prometheus-server \
+                    --timeout=600s
+
+                    # Step 6: Check if Grafana is already installed
+                    if helm list -n monitoring | grep grafana > /dev/null 2>&1; then
+                        echo "Grafana is already deployed, skipping installation."
+                    else
+                        # Step 7: Install Grafana using Helm
+                        echo "Deploying Grafana..."
+                        helm upgrade --install grafana grafana/grafana --namespace monitoring --create-namespace \
+                        --set adminPassword='admin' \
+                        --set service.type=LoadBalancer
+                    fi
+
+                    # Step 8: Wait for Grafana to be ready
+                    kubectl wait --namespace monitoring \
+                    --for=condition=available deployment/grafana \
+                    --timeout=600s
+
+                    # Step 9: Get Grafana LoadBalancer URL
+                    echo "Waiting for Grafana LoadBalancer IP..."
+                    timeout=600
+                    end=$((SECONDS + timeout))
+                    while [ $SECONDS -lt $end ]; do
+                        GRAFANA_IP=$(kubectl get svc grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || true)
+                        if [[ -n "$GRAFANA_IP" ]]; then
+                            echo "Grafana is available at: http://$GRAFANA_IP"
+                            break
+                        else
+                            echo "Waiting for Grafana LoadBalancer IP..."
+                            sleep 30
+                        fi
+                    done
+
+                    if [[ -z "$GRAFANA_IP" ]]; then
+                        echo "Failed to get Grafana LoadBalancer IP after $timeout seconds."
+                        exit 1
+                    fi
+                    '''
+                }
+            }
+        }
+
     }
 }

@@ -107,7 +107,18 @@ pipeline {
                         kubectl wait --namespace argocd \
                           --for=condition=available deployment/argocd-server \
                           --timeout=600s
+
+                        # Step 6: Expose ArgoCD server service as LoadBalancer
+                        kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
                     fi
+
+                    # Step 7: Wait for the LoadBalancer external IP/hostname to be assigned
+                    echo "Waiting for ArgoCD server LoadBalancer IP..."
+                    kubectl get svc argocd-server -n argocd --watch -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || true
+
+                    # Step 8: Get the ArgoCD server LoadBalancer URL and output it
+                    ARGOCD_URL=$(kubectl get svc argocd-server -n argocd -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+                    echo "ArgoCD is available at: http://${ARGOCD_URL}"
                     '''
                 }
             }

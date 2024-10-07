@@ -90,6 +90,7 @@ pipeline {
                 script {
                     // Apply ArgoCD Helm chart
                     sh '''
+                    #!/bin/bash
                     # Step 1: Add ArgoCD Helm repository
                     helm repo add argo https://argoproj.github.io/argo-helm
 

@@ -46,6 +46,6 @@ resource "aws_security_group_rule" "allow_http" {
 
 # Declare the data source for EKS cluster authentication
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id  # This should match your cluster name
+  name = module.eks.cluster_name  # This should match your cluster name
 }
 

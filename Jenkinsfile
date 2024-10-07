@@ -74,7 +74,7 @@ pipeline {
             }
         }
 
-       stage('Terraform Apply') {
+        stage('Terraform Apply') {
             steps {
                     dir('terraform') {
                     // Run Terraform plan to show infrastructure changes
@@ -84,6 +84,38 @@ pipeline {
                     }
                 }    
             }
+
+        stage('Deploy ArgoCD to EKS') {
+            steps {
+                script {
+                    // Apply ArgoCD Helm chart
+                    sh '''
+                    # Step 1: Add ArgoCD Helm repository
+                    helm repo add argo https://argoproj.github.io/argo-helm
+
+                    # Step 2: Update the Helm repositories
+                    helm repo update
+
+                    # Step 3: Install ArgoCD using Helm
+                    helm install argocd argo/argo-cd --namespace argocd --create-namespace
+
+                    # Step 4: Wait for ArgoCD to be ready
+                    kubectl wait --namespace argocd \
+                      --for=condition=available deployment/argocd-server \
+                      --timeout=600s
+                    '''
+                }
+            }
+        }
+
+        post {
+            success {
+                echo 'ArgoCD successfully deployed!'
+            }
+            failure {
+                echo 'Failed to deploy ArgoCD.'
+            }
+        }
         
 
     }

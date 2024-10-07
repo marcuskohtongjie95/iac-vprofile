@@ -114,8 +114,9 @@ pipeline {
 
                     # Step 7: Wait for the LoadBalancer external IP/hostname to be assigned
                     echo "Waiting for ArgoCD server LoadBalancer IP..."
-                    timeout(10) { // Timeout set to 10 minutes
-                        while true; do
+                    timeout=600 # Timeout set to 10 minutes
+                    end=$((SECONDS+timeout))
+                    while [ $SECONDS -lt $end ]; do
                         IP=$(kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || true)
                         if [ -n "$IP" ]; then
                             echo "ArgoCD is available at: http://$IP"
@@ -123,9 +124,13 @@ pipeline {
                         else
                             echo "Waiting for LoadBalancer IP..."
                             sleep 30
+                        fi
+                    done
+
+                    if [ -z "$IP" ]; then
+                        echo "Failed to get LoadBalancer IP after $timeout seconds."
+                        exit 1
                     fi
-                        done
-                    }
                     '''
                 }
             }

@@ -96,13 +96,18 @@ pipeline {
                     # Step 2: Update the Helm repositories
                     helm repo update
 
-                    # Step 3: Install ArgoCD using Helm
-                    helm install argocd argo/argo-cd --namespace argocd --create-namespace
+                    # Step 3: Check if ServiceAccount already exists
+                    if kubectl get serviceaccount argocd-application-controller --namespace argocd > /dev/null 2>&1; then
+                        echo "ServiceAccount argocd-application-controller already exists, skipping Helm install."
+                    else
+                        # Step 4: Install ArgoCD using Helm
+                        helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 
-                    # Step 4: Wait for ArgoCD to be ready
-                    kubectl wait --namespace argocd \
-                      --for=condition=available deployment/argocd-server \
-                      --timeout=600s
+                        # Step 5: Wait for ArgoCD to be ready
+                        kubectl wait --namespace argocd \
+                          --for=condition=available deployment/argocd-server \
+                          --timeout=600s
+                    fi
                     '''
                 }
             }

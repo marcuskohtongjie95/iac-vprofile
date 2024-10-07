@@ -13,4 +13,10 @@ locals {
   cluster_name = var.clusterName
 }
 
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"  # Path to kubeconfig file
+  }
+}
+
 ##

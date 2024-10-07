@@ -108,15 +108,5 @@ pipeline {
             }
         }
 
-        post {
-            success {
-                echo 'ArgoCD successfully deployed!'
-            }
-            failure {
-                echo 'Failed to deploy ArgoCD.'
-            }
-        }
-        
-
     }
 }

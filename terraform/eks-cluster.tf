@@ -56,7 +56,12 @@ resource "aws_iam_policy" "node_group_permissions" {
           "autoscaling:SetDesiredCapacity",
           "ec2:DescribeLaunchTemplateVersions",
           "eks:DescribeNodegroup",
-          "eks:ListNodegroups"
+          "eks:ListNodegroups",
+          "ec2:CreateVolume",
+          "ec2:DescribeVolumes",
+          "ec2:AttachVolume",
+          "ec2:DetachVolume",
+          "ec2:DeleteVolume"
         ]
         Resource = "*"
       }

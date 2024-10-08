@@ -146,28 +146,6 @@ pipeline {
                           --for=condition=available deployment/argocd-server \
                           --timeout=300s
 
-                        # Step 6: Expose ArgoCD server service as LoadBalancer
-                        kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-                    fi
-
-                    # Step 7: Wait for the LoadBalancer external IP/hostname to be assigned
-                    echo "Waiting for ArgoCD server LoadBalancer IP..."
-                    timeout=300 # Timeout set to 5 minutes
-                    end=$((SECONDS + timeout))
-                    while [ $SECONDS -lt $end ]; do
-                        IP=$(kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || true)
-                        if [[ -n "$IP" ]]; then
-                            echo "ArgoCD is available at: http://$IP"
-                            break
-                        else
-                            echo "Waiting for LoadBalancer IP..."
-                            sleep 30
-                        fi
-                    done
-
-                    if [[ -z "$IP" ]]; then
-                        echo "Failed to get LoadBalancer IP after $timeout seconds."
-                        exit 1
                     fi
                     '''
                 }
@@ -210,7 +188,7 @@ pipeline {
                         echo "Deploying Grafana..."
                         helm upgrade --install grafana grafana/grafana --namespace monitoring --create-namespace \
                         --set adminPassword='admin' \
-                        --set service.type=LoadBalancer
+                        --set service.type=ClusterIP
                     fi
 
                     # Step 8: Wait for Grafana to be ready

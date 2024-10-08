@@ -136,7 +136,24 @@ pipeline {
                 }
             }
         }
-
+        
+        stage('Deploy Autoscaler') {
+            steps {
+                script {
+                    sh '''
+                    helm repo add autoscaler https://kubernetes.github.io/autoscaler
+                    helm repo update
+                    helm install cluster-autoscaler autoscaler/cluster-autoscaler \
+                    --namespace kube-system \
+                    --set autoDiscovery.clusterName=gitops-proj-eks \
+                    --set awsRegion=$AWS_DEFAULT_REGION \
+                    --set extraArgs.balance-similar-node-groups=true \
+                    --set extraArgs.skip-nodes-with-system-pods=false
+                    '''
+                }
+            }
+        }
+        
 
         stage('Deploy Monitoring Stack (Prometheus and Grafana)') {
             steps {

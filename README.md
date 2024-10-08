@@ -20,5 +20,7 @@ Terraform version 1.9.5
 - To save cost, only destroy EKS cluster after project is done and keep the VPCs/public/private subnets as Jenkins server share the same public subnet.
 terraform destroy -target=module.eks
 
+- edit name of eks-cluster.tf file to eks-cluster.tf before below step
+
 - To further save costs, delete the NAT gateway by modifying vpc.tf (enable_nat_gateway   = false) then use terraform apply
 

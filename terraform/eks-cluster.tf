@@ -66,12 +66,12 @@ resource "aws_iam_policy" "node_group_permissions" {
 
 # Attach the specific permissions policy to the EKS node group IAM role
 resource "aws_iam_role_policy_attachment" "node_group_permissions_attachment" {
-  role       = module.eks.node_groups["one"].iam_role_arn
+  role       = module.eks.managed_node_groups["one"].iam_role_arn
   policy_arn = aws_iam_policy.node_group_permissions.arn
 }
 
 # Attach the AmazonEKSClusterPolicy to the EKS node group IAM role
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
-  role       = module.eks.node_groups["one"].iam_role_arn
+  role       = module.eks.managed_node_groups["one"].iam_role_arn
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }

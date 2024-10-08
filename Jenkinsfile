@@ -83,7 +83,25 @@ pipeline {
                     aws eks --region us-east-1 update-kubeconfig --name gitops-proj-eks
                     '''
                     }
-                }     
+                } 
+        
+        stage('Deploy Autoscaler') {
+            steps {
+                script {
+                    sh '''
+                    helm repo add autoscaler https://kubernetes.github.io/autoscaler
+                    helm repo update
+                    helm upgrade --install cluster-autoscaler autoscaler/cluster-autoscaler \
+                    --namespace kube-system \
+                    --set autoDiscovery.clusterName=gitops-proj-eks \
+                    --set awsRegion=$AWS_DEFAULT_REGION \
+                    --set extraArgs.balance-similar-node-groups=true \
+                    --set extraArgs.skip-nodes-with-system-pods=false
+                    '''
+                }
+            }
+        }
+            
 
         stage('Install NGINX Ingress Controller using Helm') {
             steps {
@@ -96,10 +114,9 @@ pipeline {
                     
                     // Deploy NGINX Ingress Controller to the EKS cluster
                     sh """
-                        helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-                        --namespace ingress-nginx --create-namespace \
-                        --set controller.replicaCount=2 \
-                        --set controller.service.type=LoadBalancer
+                        helm upgrade --install ingress-nginx ingress-nginx \
+                        --repo https://kubernetes.github.io/ingress-nginx \
+                        --namespace ingress-nginx --create-namespace
                     """
                 }
             }
@@ -156,24 +173,7 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy Autoscaler') {
-            steps {
-                script {
-                    sh '''
-                    helm repo add autoscaler https://kubernetes.github.io/autoscaler
-                    helm repo update
-                    helm install cluster-autoscaler autoscaler/cluster-autoscaler \
-                    --namespace kube-system \
-                    --set autoDiscovery.clusterName=gitops-proj-eks \
-                    --set awsRegion=$AWS_DEFAULT_REGION \
-                    --set extraArgs.balance-similar-node-groups=true \
-                    --set extraArgs.skip-nodes-with-system-pods=false
-                    '''
-                }
-            }
-        }
-        
+    
 
         stage('Deploy Monitoring Stack (Prometheus and Grafana)') {
             steps {
